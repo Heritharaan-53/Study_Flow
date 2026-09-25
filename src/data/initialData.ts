@@ -1,0 +1,385 @@
+import { LearningState, Subject, StudySession, UserPreferences } from '../types';
+
+function createRecentDate(daysAgo: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() - daysAgo);
+  return d.toISOString().split('T')[0];
+}
+
+const initialPreferences: UserPreferences = {
+  dailyTargetMinutes: 60,
+  soundEnabled: true,
+  defaultTimerMode: 'pomodoro',
+  userName: 'Alex Chen',
+  avatarUrl: '/src/assets/images/avatar_learner_1790327589197.jpg',
+};
+
+const initialSubjects: Subject[] = [
+  {
+    id: 'sub-rust',
+    title: 'Modern Rust & Systems Programming',
+    category: 'engineering',
+    level: 'intermediate',
+    color: '#0284c7', // Sky / Azure
+    coverImage: '/src/assets/images/study_concept_coding_1790327563445.jpg',
+    description: 'Master ownership, borrowing, lifetime semantics, concurrency without data races, and build high-performance WebAssembly tools.',
+    targetWeeklyHours: 8,
+    targetEndDate: '2026-12-15',
+    createdAt: createRecentDate(28),
+    modules: [
+      {
+        id: 'mod-rust-1',
+        title: '01. Memory Safety & The Borrow Checker',
+        description: 'Deep dive into stack vs heap allocations, moving vs copying semantics, and mutable borrows.',
+        status: 'in_progress',
+        estimatedHours: 12,
+        items: [
+          { id: 'item-1', title: 'Ownership Rules & Move Semantics in depth', isCompleted: true },
+          { id: 'item-2', title: 'References and Borrowing (One mutable XOR multiple immutables)', isCompleted: true },
+          { id: 'item-3', title: 'Slice Types & Memory Layout in Heap', isCompleted: true },
+          { id: 'item-4', title: 'Lifetimes annotation syntax & elision rules', isCompleted: false },
+        ],
+      },
+      {
+        id: 'mod-rust-2',
+        title: '02. Generics, Traits & Associated Types',
+        description: 'Polymorphism via static dispatch and zero-cost abstractions.',
+        status: 'in_progress',
+        estimatedHours: 10,
+        items: [
+          { id: 'item-5', title: 'Defining Traits and implementing for standard types', isCompleted: true },
+          { id: 'item-6', title: 'Trait Bounds and where clauses', isCompleted: false },
+          { id: 'item-7', title: 'Dynamic dispatch with Trait Objects (dyn Trait)', isCompleted: false },
+          { id: 'item-8', title: 'Operator overloading with std::ops', isCompleted: false },
+        ],
+      },
+      {
+        id: 'mod-rust-3',
+        title: '03. Fearless Concurrency & Async Tokio',
+        description: 'Threads, message passing with channels, shared state with Arc & Mutex, and async runtime.',
+        status: 'not_started',
+        estimatedHours: 14,
+        items: [
+          { id: 'item-9', title: 'Using spawn and join handles', isCompleted: false },
+          { id: 'item-10', title: 'MPSC Channels (Multi-producer, single-consumer)', isCompleted: false },
+          { id: 'item-11', title: 'Sync and Send marker traits', isCompleted: false },
+          { id: 'item-12', title: 'Tokio async executor and Future polling', isCompleted: false },
+        ],
+      },
+    ],
+    flashcards: [
+      {
+        id: 'card-r1',
+        subjectId: 'sub-rust',
+        front: 'What are the three core rules of Rust Ownership?',
+        back: '1. Each value in Rust has an owner.\n2. There can only be one owner at a time.\n3. When the owner goes out of scope, the value is dropped.',
+        difficulty: 'good',
+        nextReviewDate: createRecentDate(0), // Due today!
+        intervalDays: 4,
+        reviewCount: 3,
+        lastReviewed: createRecentDate(4),
+      },
+      {
+        id: 'card-r2',
+        subjectId: 'sub-rust',
+        front: 'What is the distinction between Copy and Clone traits in Rust?',
+        back: 'Copy is an implicit, bitwise shallow copy (free or cheap, e.g. primitives like i32). Clone is an explicit method call that may perform deep heap allocation or custom copying logic.',
+        difficulty: 'hard',
+        nextReviewDate: createRecentDate(0), // Due today!
+        intervalDays: 2,
+        reviewCount: 2,
+        lastReviewed: createRecentDate(2),
+      },
+      {
+        id: 'card-r3',
+        subjectId: 'sub-rust',
+        front: 'Why does Rust disallow having both a mutable reference and an immutable reference simultaneously?',
+        back: 'To prevent data races at compile time. If code could read a value through an immutable reference while another thread or code path mutated it through a mutable reference, undefined reading state occurs.',
+        difficulty: 'good',
+        nextReviewDate: createRecentDate(-3), // Due in 3 days
+        intervalDays: 5,
+        reviewCount: 2,
+        lastReviewed: createRecentDate(2),
+      },
+    ],
+    notes: [
+      {
+        id: 'note-r1',
+        subjectId: 'sub-rust',
+        moduleId: 'mod-rust-1',
+        title: 'Mental Model: Lifetimes do not change how long variables live',
+        keyTakeaway: 'Lifetimes are descriptive type-checker proofs, not runtime garbage collection anchors.',
+        content: `A common beginner misconception is that annotating a lifetime 'a extends the duration of an object in memory.
+
+In reality:
+- Lifetimes merely inform the borrow checker about relationships between reference scopes.
+- If a function returns a reference, that reference cannot outlive any of the referenced parameters passed in.
+- Elision rules save typing for common patterns (e.g. single input reference -> output gets same lifetime).`,
+        tags: ['rust', 'memory', 'borrow-checker'],
+        createdAt: createRecentDate(10),
+        updatedAt: createRecentDate(2),
+      },
+      {
+        id: 'note-r2',
+        subjectId: 'sub-rust',
+        moduleId: 'mod-rust-2',
+        title: 'Static vs Dynamic Dispatch Trait Performance',
+        keyTakeaway: 'Static dispatch with `impl Trait` monomorphizes code (zero runtime overhead), whereas `dyn Trait` uses vtable pointers.',
+        content: `Monomorphization generates a copy of the function for every concrete type that implements the trait. This allows the compiler to inline code aggressively. Use ` + '`dyn Trait`' + ` only when heterogeneous collections are strictly required.`,
+        tags: ['traits', 'performance', 'zero-cost'],
+        createdAt: createRecentDate(5),
+        updatedAt: createRecentDate(5),
+      },
+    ],
+  },
+  {
+    id: 'sub-spanish',
+    title: 'Conversational Spanish (B1 to B2)',
+    category: 'language',
+    level: 'intermediate',
+    color: '#059669', // Emerald
+    coverImage: '/src/assets/images/study_concept_languages_1790327575970.jpg',
+    description: 'Transition from intermediate grammar drills to spontaneous spoken fluency, subjunctive moods, and natural idioms.',
+    targetWeeklyHours: 6,
+    targetEndDate: '2026-11-30',
+    createdAt: createRecentDate(21),
+    modules: [
+      {
+        id: 'mod-sp-1',
+        title: '01. Subjunctive Mood Fundamentals (El Subjuntivo)',
+        description: 'Expressing desires, doubts, possibilities, and hypothetical situations.',
+        status: 'in_progress',
+        estimatedHours: 8,
+        items: [
+          { id: 'sp-1', title: 'W.E.I.R.D.O. triggers (Wishes, Emotions, Impersonal, etc.)', isCompleted: true },
+          { id: 'sp-2', title: 'Present subjunctive regular vs irregular conjugations', isCompleted: true },
+          { id: 'sp-3', title: 'Imperfect subjunctive (-ra vs -se endings)', isCompleted: false },
+          { id: 'sp-4', title: 'Conditional sentences with "Si tuviera... haría..."', isCompleted: false },
+        ],
+      },
+      {
+        id: 'mod-sp-2',
+        title: '02. Conversational Connectors & Discourse Markers',
+        description: 'Linking ideas seamlessly without pausing: sin embargo, por lo tanto, a pesar de que.',
+        status: 'not_started',
+        estimatedHours: 6,
+        items: [
+          { id: 'sp-5', title: 'Contrast connectors (a diferencia de, no obstante)', isCompleted: false },
+          { id: 'sp-6', title: 'Cause & Consequence markers (dado que, por consiguiente)', isCompleted: false },
+          { id: 'sp-7', title: 'Fillers and holding the floor (o sea, bueno, fíjate que)', isCompleted: false },
+        ],
+      },
+    ],
+    flashcards: [
+      {
+        id: 'card-s1',
+        subjectId: 'sub-spanish',
+        front: 'Translate & conjugate: "I doubt that he has enough money" (Dudar que...)',
+        back: 'Dudo que él tenga suficiente dinero.\n(Uses Subjunctive "tenga" because "dudar" conveys epistemic uncertainty).',
+        difficulty: 'good',
+        nextReviewDate: createRecentDate(0), // Due today!
+        intervalDays: 3,
+        reviewCount: 2,
+        lastReviewed: createRecentDate(3),
+      },
+      {
+        id: 'card-s2',
+        subjectId: 'sub-spanish',
+        front: 'What is the natural conversational idiom for "To cost an arm and a leg" in Spanish?',
+        back: '"Costar un ojo de la cara" (Literally: to cost an eye from the face).',
+        difficulty: 'easy',
+        nextReviewDate: createRecentDate(-4),
+        intervalDays: 7,
+        reviewCount: 4,
+        lastReviewed: createRecentDate(3),
+      },
+    ],
+    notes: [
+      {
+        id: 'note-s1',
+        subjectId: 'sub-spanish',
+        moduleId: 'mod-sp-1',
+        title: 'Trigger Words for El Subjuntivo: The WEIRDO Acronym',
+        keyTakeaway: 'Use subjunctive whenever the main clause expresses non-objective reality.',
+        content: `W - Wishes / Desires (Quiero que, Deseo que)
+E - Emotions (Me alegra que, Temo que)
+I - Impersonal expressions (Es importante que, Es necesario que)
+R - Recommendations (Recomiendo que, Sugiero que)
+D - Doubt / Denial (Dudo que, No creo que)
+O - Ojalá (Ojalá que llueva)`,
+        tags: ['grammar', 'subjunctive', 'mnemonics'],
+        createdAt: createRecentDate(12),
+        updatedAt: createRecentDate(4),
+      },
+    ],
+  },
+];
+
+// Seed realistic study sessions across past 21 days including today and yesterday
+const initialSessions: StudySession[] = [
+  {
+    id: 'sess-today',
+    subjectId: 'sub-rust',
+    moduleId: 'mod-rust-1',
+    durationMinutes: 45,
+    date: createRecentDate(0),
+    timestamp: new Date().toISOString(),
+    notes: 'Practiced slice memory layouts and solved 4 compiler borrow-check exercises.',
+    moodRating: 5,
+    sessionType: 'pomodoro',
+    distractionsLogged: 1,
+  },
+  {
+    id: 'sess-yest-1',
+    subjectId: 'sub-spanish',
+    moduleId: 'mod-sp-1',
+    durationMinutes: 30,
+    date: createRecentDate(1),
+    timestamp: new Date(Date.now() - 86400000).toISOString(),
+    notes: 'Imperfect subjunctive conjugation speed drills on Anki style flashcards.',
+    moodRating: 4,
+    sessionType: 'review',
+    distractionsLogged: 0,
+  },
+  {
+    id: 'sess-yest-2',
+    subjectId: 'sub-rust',
+    moduleId: 'mod-rust-2',
+    durationMinutes: 50,
+    date: createRecentDate(1),
+    timestamp: new Date(Date.now() - 86400000 * 1.2).toISOString(),
+    notes: 'Drafted custom Iterator and Display traits for a binary tree struct.',
+    moodRating: 4,
+    sessionType: 'deep_work',
+    distractionsLogged: 2,
+  },
+  {
+    id: 'sess-2d',
+    subjectId: 'sub-rust',
+    moduleId: 'mod-rust-1',
+    durationMinutes: 50,
+    date: createRecentDate(2),
+    timestamp: new Date(Date.now() - 86400000 * 2).toISOString(),
+    notes: 'Read Rustonomicon Chapter 1 on Unsafe vs Safe boundaries.',
+    moodRating: 5,
+    sessionType: 'deep_work',
+    distractionsLogged: 0,
+  },
+  {
+    id: 'sess-3d',
+    subjectId: 'sub-spanish',
+    durationMinutes: 40,
+    date: createRecentDate(3),
+    timestamp: new Date(Date.now() - 86400000 * 3).toISOString(),
+    notes: 'Podcast listening practice: Radio Ambulante episode 14.',
+    moodRating: 4,
+    sessionType: 'practice',
+    distractionsLogged: 1,
+  },
+  {
+    id: 'sess-4d',
+    subjectId: 'sub-rust',
+    durationMinutes: 60,
+    date: createRecentDate(4),
+    timestamp: new Date(Date.now() - 86400000 * 4).toISOString(),
+    notes: 'Building CLI tool with Clap v4 and error handling via thiserror & anyhow.',
+    moodRating: 5,
+    sessionType: 'deep_work',
+    distractionsLogged: 1,
+  },
+  {
+    id: 'sess-5d',
+    subjectId: 'sub-spanish',
+    durationMinutes: 25,
+    date: createRecentDate(5),
+    timestamp: new Date(Date.now() - 86400000 * 5).toISOString(),
+    notes: 'Vocabulary spaced repetition review.',
+    moodRating: 3,
+    sessionType: 'review',
+    distractionsLogged: 0,
+  },
+  {
+    id: 'sess-6d',
+    subjectId: 'sub-rust',
+    durationMinutes: 45,
+    date: createRecentDate(6),
+    timestamp: new Date(Date.now() - 86400000 * 6).toISOString(),
+    notes: 'Pattern matching, guards, and if let / while let constructs.',
+    moodRating: 4,
+    sessionType: 'pomodoro',
+    distractionsLogged: 2,
+  },
+  {
+    id: 'sess-7d',
+    subjectId: 'sub-rust',
+    durationMinutes: 55,
+    date: createRecentDate(7),
+    timestamp: new Date(Date.now() - 86400000 * 7).toISOString(),
+    notes: 'Deep work on Struct memory alignments and padding.',
+    moodRating: 5,
+    sessionType: 'deep_work',
+    distractionsLogged: 0,
+  },
+  {
+    id: 'sess-9d',
+    subjectId: 'sub-spanish',
+    durationMinutes: 30,
+    date: createRecentDate(9),
+    timestamp: new Date(Date.now() - 86400000 * 9).toISOString(),
+    notes: 'Written journal entry in Spanish describing daily routine.',
+    moodRating: 4,
+    sessionType: 'practice',
+    distractionsLogged: 1,
+  },
+  {
+    id: 'sess-11d',
+    subjectId: 'sub-rust',
+    durationMinutes: 50,
+    date: createRecentDate(11),
+    timestamp: new Date(Date.now() - 86400000 * 11).toISOString(),
+    notes: 'Cargo workspaces setup and module re-export patterns.',
+    moodRating: 4,
+    sessionType: 'pomodoro',
+    distractionsLogged: 0,
+  },
+  {
+    id: 'sess-13d',
+    subjectId: 'sub-spanish',
+    durationMinutes: 40,
+    date: createRecentDate(13),
+    timestamp: new Date(Date.now() - 86400000 * 13).toISOString(),
+    notes: 'Grammar review of Por vs Para rules with exercises.',
+    moodRating: 4,
+    sessionType: 'practice',
+    distractionsLogged: 1,
+  },
+  {
+    id: 'sess-16d',
+    subjectId: 'sub-rust',
+    durationMinutes: 60,
+    date: createRecentDate(16),
+    timestamp: new Date(Date.now() - 86400000 * 16).toISOString(),
+    notes: 'Introductory ownership & reference exercises.',
+    moodRating: 3,
+    sessionType: 'deep_work',
+    distractionsLogged: 3,
+  },
+  {
+    id: 'sess-18d',
+    subjectId: 'sub-spanish',
+    durationMinutes: 35,
+    date: createRecentDate(18),
+    timestamp: new Date(Date.now() - 86400000 * 18).toISOString(),
+    notes: 'Conjugation review.',
+    moodRating: 4,
+    sessionType: 'review',
+    distractionsLogged: 0,
+  },
+];
+
+export const INITIAL_STATE: LearningState = {
+  subjects: initialSubjects,
+  sessions: initialSessions,
+  preferences: initialPreferences,
+  selectedSubjectId: null,
+};

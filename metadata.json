@@ -1,0 +1,6 @@
+{
+  "name": "OmniStudy - Self-Directed Learning & Skill Tracker",
+  "description": "Comprehensive study tracker to learn new skills, manage curriculum roadmaps, run focused Pomodoro sessions, practice spaced-repetition recall, and track study streaks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
